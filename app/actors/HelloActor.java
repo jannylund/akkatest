@@ -15,7 +15,8 @@ import javax.inject.Inject;
 public class HelloActor extends UntypedActor implements InjectedActorSupport {
 
     public static Props props = Props.create(HelloActor.class);
-    private static WSClient ws = WS.client();
+
+    @Inject WSClient ws;
     
     public void onReceive(Object msg) throws Exception {
         if (msg instanceof SayHello) {

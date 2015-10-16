@@ -1,9 +1,7 @@
 package controllers;
 
-import actors.HelloActor;
 import actors.HelloActorProtocol;
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.libs.F;
 import play.libs.ws.WSClient;
@@ -11,6 +9,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import static akka.pattern.Patterns.ask;
@@ -24,12 +23,8 @@ public class Application extends Controller {
         return ws.url("http://api.icndb.com/jokes/random").get().map(response -> ok(response.asJson()));
     }
 
-
-    // Inject actor, use akka ask.
-    final ActorRef helloActor;
-    @Inject public Application(ActorSystem system) {
-        helloActor = system.actorOf(HelloActor.props);
-    }
+    @Inject @Named("joker-actor")
+    ActorRef helloActor;
 
     public F.Promise<Result> jokeActor() {
         return F.Promise.wrap(ask(helloActor, new HelloActorProtocol.Joke(), 1000))
